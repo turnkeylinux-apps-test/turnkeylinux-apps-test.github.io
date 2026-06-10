@@ -13,28 +13,35 @@
 
 # turnkeylinux-apps - Test 18.1
 
+### moodle4  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v4-18.1-RC2)
+* Status: Builds OK. Login OK.
+* Versions: Moodle Version Moodle 4 ( MOODLE_405_STABLE ) / TurnKey Linux 18.1
+* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/31
+* Git command: git clone --branch turnkey-moodle4-18.1-RC2 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle405
+* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh* Re-checked, works downloading sources via git branch MOODLE_405_STABLE.
+* Date: 18 Feb 2026
+-----
+### moodle501  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v5-18.1-RC2)
+* Status: Builds OK. Login OK. Install plugin ok.
+* Versions: Moodle Version Moodle 5.1 ( MOODLE_501_STABLE ) / TurnKey Linux 18.1
+* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/32
+* Git command: git clone --branch turnkey-moodle5-18.1-RC2 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle501
+* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh*. "Moodle: Your server does not seem to fully support the following languages:
+
+* English ‎(en)‎
+* Français ‎(fr)‎
+* Italiano ‎(it)‎
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
+Server is debian bookworm"
+Re-checked, works downloading sources via git branch MOODLE_501_STABLE.
+* Date: 6 Jun 2026
+-----
 ### gitea ➡️ [Test ISO](https://github.com/UncleDan/turnkey-gitea/releases/tag/v18.1-RC1)
 * Status: Builds OK. Still can't login :-(
 * Versions: Gitea 1.25.4 (as of today) / TurnKey Linux 18.1
 * Pull request: https://github.com/turnkeylinux-apps/gitea/pull/17
 * Git command: git clone https://github.com/UncleDan/turnkey-gitea.git -b turnkey-gitea-18.1-RC1
 * Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh* Works out of the box, only updated versions in docs. Still can't login as "gitea" admin.
-* Date: 18 Feb 2026
------
-### moodle5  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v5-18.1-RC2)
-* Status: Builds OK. Login OK.
-* Versions: Moodle Version 5.1.3+ (Build: 20260217) as of today / TurnKey Linux 18.1
-* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/32
-* Git command: git clone --branch turnkey-moodle5-18.1-RC2 https://github.com/UncleDan/turnkey-moodle.git turnkey-moodle5
-* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh* Re-checked, works downloading sources via git branch MOODLE_501_STABLE.
-* Date: 18 Feb 2026
------
-### moodle4  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v4-18.1-RC2)
-* Status: Builds OK. Login OK.
-* Versions: Moodle Version 4.5.10+ (Build: 20260217) as of today / TurnKey Linux 18.1
-* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/31
-* Git command: git clone --branch turnkey-moodle4-18.1-RC2 https://github.com/UncleDan/turnkey-moodle.git turnkey-moodle4
-* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh* Re-checked, works downloading sources via git branch MOODLE_405_STABLE.
 * Date: 18 Feb 2026
 -----
 ### mattermost  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-mattermost/releases/tag/turnkey-mattermost-18.1-RC1)
