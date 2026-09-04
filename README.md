@@ -13,13 +13,35 @@
 
 # turnkeylinux-apps - Test 18.1
 
-### moodle4  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v4-18.1-RC2)
+### moodle502  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v5-18.1-RC2)
+* Status: Builds OK. Login OK. Install plugin ok.
+* Versions: Moodle Version Moodle 5.2 ( MOODLE_502_STABLE ) / TurnKey Linux 18.1
+* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/32
+* Git command: git clone --branch turnkey-moodle502-18.1-RC1 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle502
+* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh*. "Moodle: Your server does not seem to fully support the following languages:
+
+* English ‎(en)‎
+* Français ‎(fr)‎
+* Italiano ‎(it)‎
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
+Server is debian bookworm"
+Re-checked, works downloading sources via git branch MOODLE_501_STABLE.
+* Date: 10 Jun 2026
+-----
+### moodle405  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v4-18.1-RC2)
 * Status: Builds OK. Login OK.
 * Versions: Moodle Version Moodle 4 ( MOODLE_405_STABLE ) / TurnKey Linux 18.1
 * Pull request: https://github.com/turnkeylinux-apps/moodle/pull/31
 * Git command: git clone --branch turnkey-moodle4-18.1-RC2 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle405
-* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh* Re-checked, works downloading sources via git branch MOODLE_405_STABLE.
-* Date: 18 Feb 2026
+* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh* "Moodle: Your server does not seem to fully support the following languages:
+
+* English ‎(en)‎
+* Français ‎(fr)‎
+* Italiano ‎(it)‎
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
+Server is debian bookworm"
+Re-checked, works downloading sources via git branch MOODLE_405_STABLE.
+* Date: 10 Jun 2026
 -----
 ### moodle501  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v5-18.1-RC2)
 * Status: Builds OK. Login OK. Install plugin ok.
