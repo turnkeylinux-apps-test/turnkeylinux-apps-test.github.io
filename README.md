@@ -13,7 +13,7 @@
 
 # turnkeylinux-apps - Test 19
 
-### moodle-522  ➡️ [Test ISO](#)
+### moodle-5.2.2  ➡️ [Test ISO](#)
 * Status: ?
 * Versions: Moodle Version Moodle 5.2.2 (tag "v5.2.2") / TurnKey Linux 19
 * Pull request: ?
