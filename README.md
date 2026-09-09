@@ -13,11 +13,11 @@
 
 # turnkeylinux-apps - Test 19
 
-### moodle-5.2.2  ➡️ [Test ISO](#)
+### moodle050202  ➡️ [Test ISO](#)
 * Status: ?
 * Versions: Moodle Version Moodle 5.2.2 (tag "v5.2.2") / TurnKey Linux 19
 * Pull request: ?
-* Git command: git clone --branch perms-enhancement  https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle-5.2.2
+* Git command: git clone --branch perms-enhancement https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle050202
 * Bugs/Notes: ?
 
 ```
@@ -346,6 +346,10 @@ make: *** [/usr/share/fab/product.mk:569: build/stamps/root.patched] Error 1
 
 ## MEMO
 ```
+cd /turnkey
+git clone https://github.com/turnkeylinux/bootstrap.git
+cd bootstrap
+
 git clone https://github.com/turnkeylinux-apps/myappname
 cd myappname
 make
