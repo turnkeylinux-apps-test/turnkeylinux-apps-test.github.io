@@ -11,8 +11,59 @@
 :: : :::   : : :  :   :: : :::   :: : :                                    
 ```
 
+# turnkeylinux-apps - Test 19
+
+### moodle5-2-3  ➡️ [Test ISO](https://github.com/turnkeylinux-apps-test/turnkey-moodle/releases/tag/tkl19-moodle5.2.3)
+* Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
+* Versions: Moodle Version Moodle 5.2.3 (tag "v5.2.3") / TurnKey Linux 19
+* Pull request: [36](https://github.com/turnkeylinux-apps/moodle/pull/36)
+* Git command: git clone --branch moodle5-2-3 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle5-2-3
+* Bugs/Notes: Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command " 
+
+```
+Your server does not seem to fully support the following languages:
+
+    English ‎(en)‎
+    Français ‎(fr)‎
+    Italiano ‎(it)‎
+
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.```
+* Date: 29 Sep 2026
+
+-----
+
 # turnkeylinux-apps - Test 18.1
 
+### moodle405  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v4-18.1-RC2)
+* Status: Builds OK. Login OK.
+* Versions: Moodle Version Moodle 4 ( MOODLE_405_STABLE ) / TurnKey Linux 18.1
+* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/31
+* Git command: git clone --branch turnkey-moodle4-18.1-RC2 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle405
+* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh* "Moodle: Your server does not seem to fully support the following languages:
+
+* English ‎(en)‎
+* Français ‎(fr)‎
+* Italiano ‎(it)‎
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
+Server is debian bookworm"
+Re-checked, works downloading sources via git branch MOODLE_405_STABLE.
+* Date: 10 Jun 2026
+-----
+### moodle501  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v5-18.1-RC2)
+* Status: Builds OK. Login OK. Install plugin ok.
+* Versions: Moodle Version Moodle 5.1 ( MOODLE_501_STABLE ) / TurnKey Linux 18.1
+* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/32
+* Git command: git clone --branch turnkey-moodle5-18.1-RC2 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle501
+* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh*. "Moodle: Your server does not seem to fully support the following languages:
+
+* English ‎(en)‎
+* Français ‎(fr)‎
+* Italiano ‎(it)‎
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
+Server is debian bookworm"
+Re-checked, works downloading sources via git branch MOODLE_501_STABLE.
+* Date: 6 Jun 2026
+-----
 ### gitea ➡️ [Test ISO](https://github.com/UncleDan/turnkey-gitea/releases/tag/v18.1-RC1)
 * Status: Builds OK. Still can't login :-(
 * Versions: Gitea 1.25.4 (as of today) / TurnKey Linux 18.1
@@ -310,15 +361,28 @@ make: *** [/usr/share/fab/product.mk:569: build/stamps/root.patched] Error 1
 -----
 
 ## MEMO
+
+### Do this once just after installing:
+
+```
+cd /turnkey
+git clone https://github.com/turnkeylinux/bootstrap.git
+cd bootstrap
+RELEASE=debian/trixie make clean install
+```
+
+### Do this for each app to test:
+
 ```
 git clone https://github.com/turnkeylinux-apps/myappname
 cd myappname
 make
-mkdir -p ../mybuilds ; mv build/product.iso ../mybuilds/$(basename $(pwd))-18.1-bookworm-amd64_$(date -r build/product.iso +%Y-%m-%d_%H-%MUTC).iso
-mkdir -p ../mybuilds ; mv build/product.iso ../mybuilds/turnkey-$(basename $(pwd))-18.1-bookworm-amd64_$(date -r build/product.iso +%Y-%m-%d_%H-%MUTC).iso
+
+mkdir -p ../mybuilds ; mv build/product.iso ../mybuilds/$(basename $(pwd))-19.0-trixie-amd64_$(date -r build/product.iso +%Y-%m-%d_%H-%MUTC).iso
+for f in ../mybuilds/*.iso; do [ -f "$f" ] && [ ! -f "$f.hash" ] && sha256sum "$f" > "$f.hash"; done
 ```
 
 Copy of this in repository:
 ```
-https://github.com/UncleDan/turnkeylinux-apps-test-18
+https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io
 ```
