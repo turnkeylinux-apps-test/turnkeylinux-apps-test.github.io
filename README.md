@@ -13,12 +13,23 @@
 
 # turnkeylinux-apps - Test 19
 
-### moodle5-2-3  ➡️ [Test ISO](https://github.com/turnkeylinux-apps-test/turnkey-moodle/releases/tag/tkl19-moodle5.2.3)
+### moodle40500tag  ➡️ [Test ISO](https://github.com/turnkeylinux-apps-test/turnkey-moodle/releases/tag/v4.0.5-tag) ***
 * Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
-* Versions: Moodle Version Moodle 5.2.3 (tag "v5.2.3") / TurnKey Linux 19
-* Pull request: [36](https://github.com/turnkeylinux-apps/moodle/pull/36)
-* Git command: git clone --branch moodle5-2-3 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle5-2-3
-* Bugs/Notes: Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command " 
+* Versions: Moodle Version Moodle 4.0.5 (tag "v4.0.5") / TurnKey Linux 19
+* Pull request: -
+* Git command: git clone --branch moodle40005tag https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle40005tag
+* Bugs/Notes: Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command "tkl-set-moodle-perms --harden" or "tkl-set-moodle-perms --semi-harden". Downgrade to Moodle 4.0.5: commit checked via tag.
+* Date: 8 Oct 2026
+
+**Workaround fot SSL issue during building***
+
+```
+cd ~/turnkey-moodle40005tag
+sed -i -e 's|^mysqladmin create|mysqladmin --skip-ssl create|' \
+       -e 's|^MYSQL_BATCH="mysql --batch|MYSQL_BATCH="mysql --skip-ssl --batch|' \
+       -e 's|^mysql <<EOF|mysql --skip-ssl <<EOF|' conf.d/main
+grep -n "skip-ssl" conf.d/main
+```
 
 ```
 Your server does not seem to fully support the following languages:
@@ -27,8 +38,45 @@ Your server does not seem to fully support the following languages:
     Français ‎(fr)‎
     Italiano ‎(it)‎
 
-Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.```
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
+```
+
+### moodle503tag  ➡️ [Test ISO](https://github.com/turnkeylinux-apps-test/turnkey-moodle/releases/tag/v5.3.0-tag) ***
+* Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
+* Versions: Moodle Version Moodle 5.3.0 (tag "v5.3.0") / TurnKey Linux 19
+* Pull request: -
+* Git command: git clone --branch moodle503-tag https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle503-tag
+* Bugs/Notes: Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command "tkl-set-moodle-perms --harden" or "tkl-set-moodle-perms --semi-harden". Update to Moodle 5.3.0: commit checked via tag.
+* Date: 8 Oct 2026
+
+```
+Your server does not seem to fully support the following languages:
+
+    English ‎(en)‎
+    Français ‎(fr)‎
+    Italiano ‎(it)‎
+
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
+```
+
+
+### moodle5-2-3  ➡️ [Test ISO](https://github.com/turnkeylinux-apps-test/turnkey-moodle/releases/tag/tkl19-moodle5.2.3)
+* Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
+* Versions: Moodle Version Moodle 5.2.3 (ficed commit) / TurnKey Linux 19
+* Pull request: [36](https://github.com/turnkeylinux-apps/moodle/pull/36)
+* Git command: git clone --branch moodle5-2-3 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle5-2-3
+* Bugs/Notes: Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command " 
 * Date: 29 Sep 2026
+
+```
+Your server does not seem to fully support the following languages:
+
+    English ‎(en)‎
+    Français ‎(fr)‎
+    Italiano ‎(it)‎
+
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
+```
 
 -----
 
@@ -378,9 +426,25 @@ git clone https://github.com/turnkeylinux-apps/myappname
 cd myappname
 make
 
-mkdir -p ../mybuilds ; mv build/product.iso ../mybuilds/$(basename $(pwd))-19.0-trixie-amd64_$(date -r build/product.iso +%Y-%m-%d_%H-%MUTC).iso
+mkdir -p ../mybuilds ; mv build/product.iso ../mybuilds/$(basename $(pwd))-19.0-trixie-amd64_beta_$(date -r build/product.iso +%Y-%m-%d_%H-%MUTC).iso
 for f in ../mybuilds/*.iso; do [ -f "$f" ] && [ ! -f "$f.hash" ] && sha256sum "$f" > "$f.hash"; done
 ```
+
+```
+hostnamectl set-hostname moodle4.testdl.it
+```
+
+```
+nano /etc/hosts
+```
+
+```
+  GNU nano 8.4                                 /etc/hosts *
+127.0.0.1 localhost
+192.168.24.74 moodle4.testdl.it moodle4
+[...]
+```
+
 
 Copy of this in repository:
 ```
