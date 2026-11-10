@@ -1,6 +1,6 @@
 # Da buildcode a template LXC — appliance Moodle beta
 
-Versione 1.7 — 2026-11-10 18:17 (Europe/Rome). Ambiente: TKLDev 19 (Debian 13 Trixie).
+Versione 1.8 — 2026-11-10 18:31 (Europe/Rome). Ambiente: TKLDev 19 (Debian 13 Trixie).
 
 ## Appliance
 
@@ -32,13 +32,13 @@ cartella basta cambiare `RAW` all'inizio della riga.
 Con `wget`:
 
 ```bash
-RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup; do wget -q -O "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
+RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup tkl-build-clean; do wget -q -O "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
 ```
 
 Con `curl`:
 
 ```bash
-RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup; do curl -fsSL -o "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
+RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup tkl-build-clean; do curl -fsSL -o "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
 ```
 
 Ogni script viene installato solo se il download è riuscito e il file è davvero uno script bash
@@ -49,16 +49,17 @@ Per aggiornare gli script basta rilanciare lo stesso comando.
 In alternativa, dai file scaricati dalla chat, dalla cartella in cui si trovano:
 
 ```bash
-install -m 755 tkl-build-lxc_v1.0_20261010-2018 /usr/local/bin/tkl-build-lxc && install -m 755 tkl-build-lxc-setup_v1.0_20261010-2018 /usr/local/bin/tkl-build-lxc-setup
+install -m 755 tkl-build-lxc_v1.0_20261010-2018 /usr/local/bin/tkl-build-lxc && install -m 755 tkl-build-lxc-setup_v1.0_20261010-2018 /usr/local/bin/tkl-build-lxc-setup && install -m 755 tkl-build-clean /usr/local/bin/tkl-build-clean
 ```
 
 | Script                | Cosa fa                                                                                   |
 |-----------------------|-------------------------------------------------------------------------------------------|
 | `tkl-build-lxc-setup` | passaggi una tantum di buildtasks; fa solo quelli che mancano                             |
 | `tkl-build-lxc`       | da un branch del repository alla ISO e al template LXC archiviati; si ferma al primo errore |
+| `tkl-build-clean`     | elenca e cancella tutte le build presenti (ISO, template, resti, cartelle `build/`) per liberare spazio (vedi 6.6) |
 
 I due script non si richiamano a vicenda: `tkl-build-lxc` controlla che il setup sia stato fatto e,
-se manca, si ferma e chiede di lanciare `tkl-build-lxc-setup`.
+se manca, si ferma e chiede di lanciare `tkl-build-lxc-setup`. `tkl-build-clean` è indipendente dagli altri due.
 
 ## 2. Setup una tantum
 
@@ -195,6 +196,8 @@ e si ripetono solo `iso-release`, `bt-container` e l'archiviazione (sostituisci 
 tkl-build-lxc -n turnkey-moodle moodle405up-beta
 ```
 
+Per liberare tutto in un colpo, dopo aver elencato cosa verrà cancellato, vedi 6.6 (`tkl-build-clean`).
+
 Per non riempire di nuovo il disco:
 
 - sposta altrove (Proxmox, NAS) il contenuto di `/turnkey/fab/products/mybuilds`, che a ogni
@@ -254,6 +257,86 @@ Sotto `/turnkey/fab` non vanno toccate `bootstraps` (vedi 6.2), `common` e, se c
 servono a ogni build. Lo stesso vale per `/turnkey/buildtasks` e per il `.hash` del bootstrap.
 Le cartelle che crescono e si possono svuotare sono `/turnkey/fab/products/mybuilds` (dopo averne
 spostato il contenuto), `/mnt/isos` e i resti in `/mnt/builds/container` (vedi 6.1).
+
+### 6.5 Chiave GPG non scaricabile (signature-verify)
+
+Sintomo, durante `bt-container` (passo 6):
+
+```text
+FATAL [signature-verify]: failed to download GPG key DEE90D9970AE35D55B7C6C2DC6D254B76A9D9430.
+FATAL [iso-verify]: turnkey-moodle405up-beta-19.0-trixie-amd64.iso.hash verification failed
+FATAL [tkl-build-lxc]: step "6/8 build LXC template (bt-container)" failed ...
+```
+
+`bt-container` chiama `iso-verify`, che chiama `signature-verify`: questo richiede nel portachiavi di root la
+chiave `BT_GPGKEY` (impostata nella `config` di buildtasks). Se manca, la scarica da `keyserver.ubuntu.com` e, in
+alternativa, da `www.turnkeylinux.org`; se falliscono entrambi si ferma. La firma mancante sull'hash di una build
+locale non è un problema (solo un warning): il blocco è il download della chiave.
+
+Attenzione: quando fallisce, `iso-verify` rinomina la ISO in `.iso.corrupt` e cancella il suo `.hash`. La ISO non è
+davvero corrotta, ma il file `.corrupt` occupa spazio e va tolto prima di riprendere.
+
+Controlla quale chiave è configurata e se coincide con quella dei file di TKLDev (fingerprint):
+
+```bash
+grep -rn BT_GPGKEY /turnkey/buildtasks/config/; gpg --show-keys --with-fingerprint /turnkey/fab/common/keys/tkl-trixie-images.asc
+```
+
+Se il fingerprint coincide, importa la chiave senza rete e verifica:
+
+```bash
+gpg --import /turnkey/fab/common/keys/tkl-trixie-images.asc && gpg --list-keys DEE90D9970AE35D55B7C6C2DC6D254B76A9D9430
+```
+
+Se non coincide, prova il keyserver a mano per vedere l'errore reale (sostituisci la chiave con quella letta nella `config`):
+
+```bash
+gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys DEE90D9970AE35D55B7C6C2DC6D254B76A9D9430
+```
+
+Se fallisce, controlla la rete di TKLDev e riavvia dirmngr:
+
+```bash
+curl -sI https://keyserver.ubuntu.com | head -1; gpgconf --kill dirmngr
+```
+
+Poi togli il file `.corrupt` e riprendi senza rifare `make` (sostituisci il branch):
+
+```bash
+rm -f /mnt/isos/*.corrupt; tkl-build-lxc -n turnkey-moodle moodle405up-beta
+```
+
+### 6.6 Pulire tutte le build con tkl-build-clean
+
+Per liberare spazio senza ripristinare la macchina virtuale, `tkl-build-clean` elenca con le dimensioni tutte le
+build presenti e poi le cancella, dopo conferma:
+
+| Cosa                                              | Percorso predefinito                  |
+|---------------------------------------------------|---------------------------------------|
+| ISO, `.hash`, `.corrupt`                          | `/mnt/isos/*`                         |
+| template, `.rootfs`, `.cdroot`, resti di bt-container | `/mnt/builds/container/*`         |
+| risultato di `make`                               | `/turnkey/fab/products/*/build`       |
+| archivio ISO e template con timestamp             | `/turnkey/fab/products/mybuilds/*`    |
+
+Solo elenco, senza cancellare nulla:
+
+```bash
+tkl-build-clean -l
+```
+
+Elenco e cancellazione con conferma (bisogna scrivere `si`):
+
+```bash
+tkl-build-clean
+```
+
+Opzioni: `-y` non chiede conferma, `-k` conserva l'archivio `mybuilds`, `-h` aiuto. I percorsi si cambiano con le
+variabili `PRODUCTS_DIR`, `ARCHIVE_DIR`, `ISOS_DIR`, `CONTAINER_DIR`.
+
+Per impostazione predefinita cancella anche l'archivio `mybuilds`: se contiene ISO o template che ti servono,
+spostali prima altrove (vedi 5) oppure usa `-k`. Lo script si rifiuta di cancellare se trova mount attivi sotto i
+percorsi da pulire (`umount` prima). Non tocca mai `bootstraps`, `common`, `cdroots`, `/turnkey/buildtasks`, i
+repository clonati e il loro codice (vedi 6.4). Dopo la pulizia la build successiva riparte da zero (`make` rifà tutto).
 
 ## Appendice: procedura manuale (senza script)
 

@@ -1,0 +1,118 @@
+#!/bin/bash
+# tkl-build-clean by Daniele Lolli (UncleDan) feat. Claude AI - Release 1.0 - 2026-11-10 18-30-53
+#
+# Elenca e cancella tutte le build presenti su TKLDev (ISO, template LXC, resti
+# di build fallite, cartelle build/ dei prodotti) per liberare spazio senza
+# dover ripristinare la macchina virtuale. Non tocca bootstraps, common,
+# cdroots, buildtasks, i repository clonati e il loro codice.
+
+set -u
+
+PRODUCTS_DIR=${PRODUCTS_DIR:-/turnkey/fab/products}
+ARCHIVE_DIR=${ARCHIVE_DIR:-$PRODUCTS_DIR/mybuilds}
+ISOS_DIR=${ISOS_DIR:-/mnt/isos}
+CONTAINER_DIR=${CONTAINER_DIR:-/mnt/builds/container}
+
+fatal() { echo "FATAL [tkl-build-clean]: $*" >&2; exit 1; }
+
+usage() {
+    cat <<USAGE
+Uso: tkl-build-clean [-l] [-y] [-k] [-h]
+
+Elenca (con le dimensioni) e poi cancella tutte le build presenti:
+  - $ISOS_DIR/*                (ISO, .hash, .corrupt)
+  - $CONTAINER_DIR/*  (template, .rootfs/.cdroot, resti di bt-container)
+  - $PRODUCTS_DIR/*/build  (risultato di make)
+  - $ARCHIVE_DIR/*     (archivio ISO e template con timestamp)
+
+Opzioni:
+  -l   solo elenco, non cancella nulla
+  -y   non chiede conferma
+  -k   conserva l'archivio ($ARCHIVE_DIR)
+  -h   questo aiuto
+
+Variabili d'ambiente: PRODUCTS_DIR, ARCHIVE_DIR, ISOS_DIR, CONTAINER_DIR.
+USAGE
+}
+
+list_only=0; assume_yes=0; keep_archive=0
+while getopts ":lykh" o; do
+    case $o in
+        l) list_only=1;;
+        y) assume_yes=1;;
+        k) keep_archive=1;;
+        h) usage; exit 0;;
+        *) usage >&2; exit 1;;
+    esac
+done
+
+[ "$(id -u)" -eq 0 ] || fatal "serve root"
+
+# protezione: percorsi assoluti e non troppo corti (mai "/" o "/mnt")
+for v in PRODUCTS_DIR ARCHIVE_DIR ISOS_DIR CONTAINER_DIR; do
+    [[ ${!v} == /?*/?* ]] || fatal "$v non valido: '${!v}'"
+done
+
+shopt -s nullglob
+T=()
+for f in "$ISOS_DIR"/* "$CONTAINER_DIR"/*; do T+=("$f"); done
+for p in "$PRODUCTS_DIR"/*/; do
+    p=${p%/}
+    [ "$p" = "$ARCHIVE_DIR" ] && continue
+    [ -d "$p/build" ] && T+=("$p/build")
+done
+if [ "$keep_archive" -eq 0 ]; then
+    for f in "$ARCHIVE_DIR"/*; do T+=("$f"); done
+fi
+
+echo "Spazio prima:"
+df -h "$ISOS_DIR" "$CONTAINER_DIR" "$PRODUCTS_DIR" 2>/dev/null | awk "!seen[\$0]++"
+echo
+
+if [ "${#T[@]}" -eq 0 ]; then
+    echo "Niente da cancellare."
+    exit 0
+fi
+
+echo "Build presenti:"
+out=$(du -shc -- "${T[@]}" 2>/dev/null)
+echo "$out" | head -n -1 | sort -h
+echo "$out" | tail -1
+echo
+if [ "$keep_archive" -eq 0 ]; then
+    echo "ATTENZIONE: l'elenco comprende l'archivio $ARCHIVE_DIR: ISO e template già prodotti andranno persi (-k per conservarlo)."
+else
+    echo "L'archivio $ARCHIVE_DIR NON è incluso (-k)."
+fi
+
+# mount rimasti sotto i percorsi da cancellare (rm -rf li attraverserebbe)
+busy=$(awk '{print $2}' /proc/mounts | while read -r m; do
+    for t in "${T[@]}"; do
+        case $m in "$t"|"$t"/*) echo "$m";; esac
+    done
+done)
+if [ -n "$busy" ]; then
+    echo
+    echo "ATTENZIONE: ci sono mount attivi sotto i percorsi da cancellare:"
+    echo "$busy"
+    [ "$list_only" -eq 1 ] || fatal "smontali (umount) prima di cancellare"
+fi
+
+[ "$list_only" -eq 1 ] && exit 0
+
+if [ "$assume_yes" -eq 0 ]; then
+    echo
+    read -r -p 'Cancellare tutto quanto elencato? Scrivere "si" per confermare: ' ans
+    [ "$ans" = "si" ] || { echo "Annullato."; exit 1; }
+fi
+
+rc=0
+for t in "${T[@]}"; do
+    echo "Cancello $t"
+    rm -rf -- "$t" || { echo "ERRORE: $t non cancellato" >&2; rc=1; }
+done
+
+echo
+echo "Spazio dopo:"
+df -h "$ISOS_DIR" "$CONTAINER_DIR" "$PRODUCTS_DIR" 2>/dev/null | awk "!seen[\$0]++"
+exit $rc

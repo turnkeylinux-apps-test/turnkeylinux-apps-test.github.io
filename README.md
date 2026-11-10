@@ -19,7 +19,7 @@ Personal test results for [TurnKey Linux](https://www.turnkeylinux.org) applianc
 
 I am very honored to have been added to the GitHub organizations [turnkeylinux](https://github.com/turnkeylinux) and [Keel-Linux](https://github.com/Keel-Linux). That said, I want to be upfront about my role: what I do (and have mostly always done) is essentially **testing**, plus a few **small personal developments**. This repository is where I keep track of that work.
 
-I recently **vibe coded** a script that generates **LXC container templates** as well as ISOs: `tkl-build-lxc`, with its companion `tkl-build-lxc-setup`. It goes from a branch of an appliance repository to an archived ISO and LXC template, with hashes. It is a test tool written with AI help: use it, and read it, accordingly.
+I recently **vibe coded** a script that generates **LXC container templates** as well as ISOs: `tkl-build-lxc`, with its companions `tkl-build-lxc-setup` and `tkl-build-clean` (lists and deletes all builds to free disk space). It goes from a branch of an appliance repository to an archived ISO and LXC template, with hashes. It is a test tool written with AI help: use it, and read it, accordingly.
 
 ## Contents
 
@@ -40,6 +40,7 @@ Quick start (as root on TKLDev, see the guide for details):
 ```
 tkl-build-lxc-setup                              # one-time setup of buildtasks
 tkl-build-lxc turnkey-moodle moodle53-beta       # ISO + LXC template, archived with hashes
+tkl-build-clean -l                               # list all builds (without -l: also delete them)
 ```
 
 -----

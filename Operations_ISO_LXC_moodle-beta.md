@@ -1,6 +1,6 @@
 # From buildcode to LXC template — Moodle beta appliances
 
-Version 1.7 — 2026-11-10 18:17 (Europe/Rome). Environment: TKLDev 19 (Debian 13 Trixie).
+Version 1.8 — 2026-11-10 18:31 (Europe/Rome). Environment: TKLDev 19 (Debian 13 Trixie).
 
 🇬🇧 English translation of the Italian guide [Operazioni_ISO_LXC_moodle-beta.md](https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/blob/recheck-26.06/Operazioni_ISO_LXC_moodle-beta.md) 🇮🇹
 
@@ -34,13 +34,13 @@ folder, just change `RAW` at the start of the line.
 With `wget`:
 
 ```bash
-RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup; do wget -q -O "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
+RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup tkl-build-clean; do wget -q -O "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
 ```
 
 With `curl`:
 
 ```bash
-RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup; do curl -fsSL -o "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
+RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup tkl-build-clean; do curl -fsSL -o "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
 ```
 
 Each script is installed only if the download succeeded and the file really is a bash script
@@ -51,16 +51,17 @@ To update the scripts, just run the same command again.
 Alternatively, from files downloaded from the chat, from the folder where they are:
 
 ```bash
-install -m 755 tkl-build-lxc_v1.0_20261010-2018 /usr/local/bin/tkl-build-lxc && install -m 755 tkl-build-lxc-setup_v1.0_20261010-2018 /usr/local/bin/tkl-build-lxc-setup
+install -m 755 tkl-build-lxc_v1.0_20261010-2018 /usr/local/bin/tkl-build-lxc && install -m 755 tkl-build-lxc-setup_v1.0_20261010-2018 /usr/local/bin/tkl-build-lxc-setup && install -m 755 tkl-build-clean /usr/local/bin/tkl-build-clean
 ```
 
 | Script                | What it does                                                                              |
 |-----------------------|-------------------------------------------------------------------------------------------|
 | `tkl-build-lxc-setup` | one-time buildtasks steps; only does the missing ones                                     |
 | `tkl-build-lxc`       | from a repository branch to the archived ISO and LXC template; stops at the first error   |
+| `tkl-build-clean`     | lists and deletes all existing builds (ISOs, templates, leftovers, `build/` folders) to free space (see 6.6) |
 
 The two scripts do not call each other: `tkl-build-lxc` checks that the setup has been done and,
-if not, stops and asks you to run `tkl-build-lxc-setup`.
+if not, stops and asks you to run `tkl-build-lxc-setup`. `tkl-build-clean` is independent of the other two.
 
 ## 2. One-time setup
 
@@ -197,6 +198,8 @@ and only `iso-release`, `bt-container` and archiving are repeated (replace the b
 tkl-build-lxc -n turnkey-moodle moodle405up-beta
 ```
 
+To free everything in one go, after listing what will be deleted, see 6.6 (`tkl-build-clean`).
+
 To avoid filling the disk again:
 
 - move the contents of `/turnkey/fab/products/mybuilds` elsewhere (Proxmox, NAS), since it grows by
@@ -256,6 +259,86 @@ Under `/turnkey/fab`, do not touch `bootstraps` (see 6.2), `common` and, if pres
 they are needed by every build. The same goes for `/turnkey/buildtasks` and for the bootstrap's `.hash`.
 The folders that grow and can be emptied are `/turnkey/fab/products/mybuilds` (after moving its
 contents elsewhere), `/mnt/isos` and the leftovers in `/mnt/builds/container` (see 6.1).
+
+### 6.5 GPG key cannot be downloaded (signature-verify)
+
+Symptom, during `bt-container` (step 6):
+
+```text
+FATAL [signature-verify]: failed to download GPG key DEE90D9970AE35D55B7C6C2DC6D254B76A9D9430.
+FATAL [iso-verify]: turnkey-moodle405up-beta-19.0-trixie-amd64.iso.hash verification failed
+FATAL [tkl-build-lxc]: step "6/8 build LXC template (bt-container)" failed ...
+```
+
+`bt-container` calls `iso-verify`, which calls `signature-verify`: this requires the `BT_GPGKEY` key (set in
+buildtasks' `config`) to be in root's keyring. If it is missing, it downloads it from `keyserver.ubuntu.com` and, as
+an alternative, from `www.turnkeylinux.org`; if both fail it stops. A missing signature on the hash of a local
+build is not a problem (just a warning): the blocker is the key download.
+
+Note: when it fails, `iso-verify` renames the ISO to `.iso.corrupt` and deletes its `.hash`. The ISO is not
+actually corrupt, but the `.corrupt` file takes up space and must be removed before resuming.
+
+Check which key is configured and whether it matches the one in TKLDev's files (fingerprint):
+
+```bash
+grep -rn BT_GPGKEY /turnkey/buildtasks/config/; gpg --show-keys --with-fingerprint /turnkey/fab/common/keys/tkl-trixie-images.asc
+```
+
+If the fingerprint matches, import the key without network access and verify:
+
+```bash
+gpg --import /turnkey/fab/common/keys/tkl-trixie-images.asc && gpg --list-keys DEE90D9970AE35D55B7C6C2DC6D254B76A9D9430
+```
+
+If it does not match, try the keyserver by hand to see the real error (replace the key with the one read from `config`):
+
+```bash
+gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys DEE90D9970AE35D55B7C6C2DC6D254B76A9D9430
+```
+
+If it fails, check TKLDev's network and restart dirmngr:
+
+```bash
+curl -sI https://keyserver.ubuntu.com | head -1; gpgconf --kill dirmngr
+```
+
+Then remove the `.corrupt` file and resume without redoing `make` (replace the branch):
+
+```bash
+rm -f /mnt/isos/*.corrupt; tkl-build-lxc -n turnkey-moodle moodle405up-beta
+```
+
+### 6.6 Cleaning all builds with tkl-build-clean
+
+To free space without restoring the virtual machine, `tkl-build-clean` lists all existing builds with their
+sizes and then deletes them, after confirmation:
+
+| What                                              | Default path                          |
+|---------------------------------------------------|---------------------------------------|
+| ISOs, `.hash`, `.corrupt`                         | `/mnt/isos/*`                         |
+| templates, `.rootfs`, `.cdroot`, bt-container leftovers | `/mnt/builds/container/*`       |
+| `make` output                                     | `/turnkey/fab/products/*/build`       |
+| archive of ISOs and templates with timestamp      | `/turnkey/fab/products/mybuilds/*`    |
+
+List only, without deleting anything:
+
+```bash
+tkl-build-clean -l
+```
+
+List and delete with confirmation (you must type `si`, Italian for "yes"):
+
+```bash
+tkl-build-clean
+```
+
+Options: `-y` skips the confirmation, `-k` keeps the `mybuilds` archive, `-h` help. Paths can be changed with the
+`PRODUCTS_DIR`, `ARCHIVE_DIR`, `ISOS_DIR`, `CONTAINER_DIR` variables.
+
+By default it also deletes the `mybuilds` archive: if it contains ISOs or templates you still need, move them
+elsewhere first (see 5) or use `-k`. The script refuses to delete if it finds active mounts under the paths to
+clean (`umount` first). It never touches `bootstraps`, `common`, `cdroots`, `/turnkey/buildtasks`, the cloned
+repositories and their code (see 6.4). After cleaning, the next build starts from scratch (`make` redoes everything).
 
 ## Appendix: manual procedure (without scripts)
 
