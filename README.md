@@ -13,6 +13,25 @@
 
 # turnkeylinux-apps - Test 19
 
+
+### moodle53-beta  ➡️ [Test ISO](#)
+* Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
+* Versions: Moodle Version Moodle 5.3.x, branch MOODLE_503_STABLE, Version 5.3 (Build: 20261005) as of todau / TurnKey Linux 19
+* Pull request: -
+* Git command:  tkl-build-lxc turnkey-moodle moodle53-beta
+* Bugs/Notes: New build scripts. Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command "tkl-set-moodle-perms" . .git folder (if present) is reserved to toor for upgrades.
+* Date: 12 Oct 2026
+
+```
+Your server does not seem to fully support the following languages:
+
+    English ‎(en)‎
+    Français ‎(fr)‎
+    Italiano ‎(it)‎
+
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
+```
+
 ### moodle40500tag  ➡️ [Test ISO](https://github.com/turnkeylinux-apps-test/turnkey-moodle/releases/tag/v4.0.5-tag) ***
 * Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
 * Versions: Moodle Version Moodle 4.0.5 (tag "v4.0.5") / TurnKey Linux 19
@@ -41,77 +60,10 @@ Your server does not seem to fully support the following languages:
 Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
 ```
 
-### moodle503tag  ➡️ [Test ISO](https://github.com/turnkeylinux-apps-test/turnkey-moodle/releases/tag/v5.3.0-tag) ***
-* Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
-* Versions: Moodle Version Moodle 5.3.0 (tag "v5.3.0") / TurnKey Linux 19
-* Pull request: -
-* Git command: git clone --branch moodle503-tag https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle503-tag
-* Bugs/Notes: Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command "tkl-set-moodle-perms --harden" or "tkl-set-moodle-perms --semi-harden". Update to Moodle 5.3.0: commit checked via tag.
-* Date: 8 Oct 2026
-
-```
-Your server does not seem to fully support the following languages:
-
-    English ‎(en)‎
-    Français ‎(fr)‎
-    Italiano ‎(it)‎
-
-Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
-```
-
-
-### moodle5-2-3  ➡️ [Test ISO](https://github.com/turnkeylinux-apps-test/turnkey-moodle/releases/tag/tkl19-moodle5.2.3)
-* Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
-* Versions: Moodle Version Moodle 5.2.3 (ficed commit) / TurnKey Linux 19
-* Pull request: [36](https://github.com/turnkeylinux-apps/moodle/pull/36)
-* Git command: git clone --branch moodle5-2-3 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle5-2-3
-* Bugs/Notes: Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command " 
-* Date: 29 Sep 2026
-
-```
-Your server does not seem to fully support the following languages:
-
-    English ‎(en)‎
-    Français ‎(fr)‎
-    Italiano ‎(it)‎
-
-Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
-```
-
 -----
 
 # turnkeylinux-apps - Test 18.1
 
-### moodle405  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v4-18.1-RC2)
-* Status: Builds OK. Login OK.
-* Versions: Moodle Version Moodle 4 ( MOODLE_405_STABLE ) / TurnKey Linux 18.1
-* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/31
-* Git command: git clone --branch turnkey-moodle4-18.1-RC2 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle405
-* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh* "Moodle: Your server does not seem to fully support the following languages:
-
-* English ‎(en)‎
-* Français ‎(fr)‎
-* Italiano ‎(it)‎
-Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
-Server is debian bookworm"
-Re-checked, works downloading sources via git branch MOODLE_405_STABLE.
-* Date: 10 Jun 2026
------
-### moodle501  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v5-18.1-RC2)
-* Status: Builds OK. Login OK. Install plugin ok.
-* Versions: Moodle Version Moodle 5.1 ( MOODLE_501_STABLE ) / TurnKey Linux 18.1
-* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/32
-* Git command: git clone --branch turnkey-moodle5-18.1-RC2 https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle501
-* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/UncleDan/turnkeylinux-apps-test-18/blob/main/hotfix-mysqltuner-perl-link.sh*. "Moodle: Your server does not seem to fully support the following languages:
-
-* English ‎(en)‎
-* Français ‎(fr)‎
-* Italiano ‎(it)‎
-Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
-Server is debian bookworm"
-Re-checked, works downloading sources via git branch MOODLE_501_STABLE.
-* Date: 6 Jun 2026
------
 ### gitea ➡️ [Test ISO](https://github.com/UncleDan/turnkey-gitea/releases/tag/v18.1-RC1)
 * Status: Builds OK. Still can't login :-(
 * Versions: Gitea 1.25.4 (as of today) / TurnKey Linux 18.1
@@ -119,23 +71,9 @@ Re-checked, works downloading sources via git branch MOODLE_501_STABLE.
 * Git command: git clone https://github.com/UncleDan/turnkey-gitea.git -b turnkey-gitea-18.1-RC1
 * Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/blob/main/hotfix-mysqltuner-perl-link.sh* Works out of the box, only updated versions in docs. Still can't login as "gitea" admin.
 * Date: 18 Feb 2026
+
 -----
-### moodle5  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v5-18.1-RC2)
-* Status: Builds OK. Login OK.
-* Versions: Moodle Version 5.1.3+ (Build: 20260217) as of today / TurnKey Linux 18.1
-* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/32
-* Git command: git clone --branch turnkey-moodle5-18.1-RC2 https://github.com/UncleDan/turnkey-moodle.git turnkey-moodle5
-* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/blob/main/hotfix-mysqltuner-perl-link.sh* Re-checked, works downloading sources via git branch MOODLE_501_STABLE.
-* Date: 18 Feb 2026
------
-### moodle4  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v4-18.1-RC2)
-* Status: Builds OK. Login OK.
-* Versions: Moodle Version 4.5.10+ (Build: 20260217) as of today / TurnKey Linux 18.1
-* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/31
-* Git command: git clone --branch turnkey-moodle4-18.1-RC2 https://github.com/UncleDan/turnkey-moodle.git turnkey-moodle4
-* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/blob/main/hotfix-mysqltuner-perl-link.sh* Re-checked, works downloading sources via git branch MOODLE_405_STABLE.
-* Date: 18 Feb 2026
------
+
 ### mattermost  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-mattermost/releases/tag/turnkey-mattermost-18.1-RC1)
 * Status: Builds OK. Login OK.
 * Versions: Moodle 11.3.1 as of today / TurnKey Linux 18.1
