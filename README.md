@@ -15,11 +15,11 @@
 
 ### moodle405up-beta  ➡️ [Test ISO](#)
 * Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
-* Versions: Moodle Version Moodle 5.3.x, branch MOODLE_503_STABLE, Version 5.3 (Build: 20261005) as of todau / TurnKey Linux 19
+* Versions: Moodle Version Moodle 4.0.5 from tag (upgradable) / TurnKey Linux 19
 * Pull request: -
 * Git command:  tkl-build-lxc turnkey-moodle moodle405up-beta
 * Bugs/Notes: New build scripts. Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command "tkl-set-moodle-perms" . .git folder (if present) is reserved to toor for upgrades.
-* Date: 12 Oct 2026
+* Date: 10 Nov 2026
 
 ```
 Your server does not seem to fully support the following languages:
