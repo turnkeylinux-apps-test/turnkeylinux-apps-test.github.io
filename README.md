@@ -13,12 +13,11 @@
 
 # turnkeylinux-apps - Test 19
 
-
-### moodle53-beta  ➡️ [Test ISO](#)
+### moodle405up-beta  ➡️ [Test ISO](#)
 * Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
 * Versions: Moodle Version Moodle 5.3.x, branch MOODLE_503_STABLE, Version 5.3 (Build: 20261005) as of todau / TurnKey Linux 19
 * Pull request: -
-* Git command:  tkl-build-lxc turnkey-moodle moodle53-beta
+* Git command:  tkl-build-lxc turnkey-moodle moodle405up-beta
 * Bugs/Notes: New build scripts. Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command "tkl-set-moodle-perms" . .git folder (if present) is reserved to toor for upgrades.
 * Date: 12 Oct 2026
 
@@ -32,23 +31,15 @@ Your server does not seem to fully support the following languages:
 Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
 ```
 
-### moodle40500tag  ➡️ [Test ISO](https://github.com/turnkeylinux-apps-test/turnkey-moodle/releases/tag/v4.0.5-tag) ***
+-----
+
+### moodle53-beta  ➡️ [Test ISO](#)
 * Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
-* Versions: Moodle Version Moodle 4.0.5 (tag "v4.0.5") / TurnKey Linux 19
+* Versions: Moodle Version Moodle 5.3.x, branch MOODLE_503_STABLE, Version 5.3 (Build: 20261005) as of todau / TurnKey Linux 19
 * Pull request: -
-* Git command: git clone --branch moodle40005tag https://github.com/turnkeylinux-apps-test/turnkey-moodle.git turnkey-moodle40005tag
-* Bugs/Notes: Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command "tkl-set-moodle-perms --harden" or "tkl-set-moodle-perms --semi-harden". Downgrade to Moodle 4.0.5: commit checked via tag.
-* Date: 8 Oct 2026
-
-**Workaround fot SSL issue during building***
-
-```
-cd ~/turnkey-moodle40005tag
-sed -i -e 's|^mysqladmin create|mysqladmin --skip-ssl create|' \
-       -e 's|^MYSQL_BATCH="mysql --batch|MYSQL_BATCH="mysql --skip-ssl --batch|' \
-       -e 's|^mysql <<EOF|mysql --skip-ssl <<EOF|' conf.d/main
-grep -n "skip-ssl" conf.d/main
-```
+* Git command:  tkl-build-lxc turnkey-moodle moodle53-beta
+* Bugs/Notes: New build scripts. Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command "tkl-set-moodle-perms" . .git folder (if present) is reserved to toor for upgrades.
+* Date: 12 Oct 2026
 
 ```
 Your server does not seem to fully support the following languages:

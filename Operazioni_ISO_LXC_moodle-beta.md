@@ -1,6 +1,6 @@
 # Da buildcode a template LXC — appliance Moodle beta
 
-Versione 1.4 — 2026-10-10 21:30 (Europe/Rome). Ambiente: TKLDev 19 (Debian 13 Trixie).
+Versione 1.5 — 2026-11-10 16:44 (Europe/Rome). Ambiente: TKLDev 19 (Debian 13 Trixie).
 
 ## Appliance
 
@@ -21,9 +21,32 @@ underscore o punti.
 
 Tutti i comandi della guida sono su una sola riga e vanno eseguiti come root su TKLDev.
 
-## 1. Installazione degli script
+## 1. Scaricamento e installazione degli script
 
-Dalla cartella in cui hai scaricato i due file:
+Gli script si scaricano in versione raw da un indirizzo base impostato nella variabile `RAW`
+(per ora il branch `main` del repository
+`https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io.git`, nella radice,
+con i nomi `tkl-build-lxc` e `tkl-build-lxc-setup`). Per usare un altro repository, branch o
+cartella basta cambiare `RAW` all'inizio della riga.
+
+Con `wget`:
+
+```bash
+RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup; do wget -q -O "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
+```
+
+Con `curl`:
+
+```bash
+RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup; do curl -fsSL -o "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
+```
+
+Ogni script viene installato solo se il download è riuscito e il file è davvero uno script bash
+(niente pagine di errore al posto dello script). Per ciascuno viene mostrata la riga con nome e
+release, ad esempio `# tkl-build-lxc by Daniele Lolli (UncleDan) feat. Claude AI - Release 1.0 - …`.
+Per aggiornare gli script basta rilanciare lo stesso comando.
+
+In alternativa, dai file scaricati dalla chat, dalla cartella in cui si trovano:
 
 ```bash
 install -m 755 tkl-build-lxc_v1.0_20261010-2018 /usr/local/bin/tkl-build-lxc && install -m 755 tkl-build-lxc-setup_v1.0_20261010-2018 /usr/local/bin/tkl-build-lxc-setup
