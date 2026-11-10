@@ -32,13 +32,13 @@ cartella basta cambiare `RAW` all'inizio della riga.
 Con `wget`:
 
 ```bash
-RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup; do wget -q -O "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
+RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/recheck-26.06; for s in tkl-build-lxc tkl-build-lxc-setup; do wget -q -O "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
 ```
 
 Con `curl`:
 
 ```bash
-RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/main; for s in tkl-build-lxc tkl-build-lxc-setup; do curl -fsSL -o "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
+RAW=https://raw.githubusercontent.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/recheck-26.06; for s in tkl-build-lxc tkl-build-lxc-setup; do curl -fsSL -o "/tmp/$s" "$RAW/$s" && head -1 "/tmp/$s" | grep -q '^#!/bin/bash' && install -m 755 "/tmp/$s" "/usr/local/bin/$s" && sed -n 2p "/usr/local/bin/$s" || echo "ERRORE: $s non scaricato da $RAW/$s"; rm -f "/tmp/$s"; done
 ```
 
 Ogni script viene installato solo se il download è riuscito e il file è davvero uno script bash
