@@ -1,6 +1,6 @@
 # Da buildcode a template LXC — appliance Moodle beta
 
-Versione 1.5 — 2026-11-10 16:44 (Europe/Rome). Ambiente: TKLDev 19 (Debian 13 Trixie).
+Versione 1.6 — 2026-11-10 17:54 (Europe/Rome). Ambiente: TKLDev 19 (Debian 13 Trixie).
 
 ## Appliance
 
@@ -152,6 +152,108 @@ scp /turnkey/fab/products/mybuilds/debian-13-turnkey-moodle53-beta_19.0-1_amd64_
 ```
 
 In alternativa dall'interfaccia web: storage `local` → **CT Templates** → **Upload**.
+
+## 6. Problemi e soluzioni
+
+### 6.1 Spazio su disco esaurito
+
+Sintomo, di solito durante `bt-container` (passo 6):
+
+```text
+gzip: stdout: No space left on device
+FATAL [tkl-build-lxc]: step "6/8 build LXC template (bt-container)" failed ...
+```
+
+Durante la conversione devono stare sul disco contemporaneamente la ISO, la ISO estratta
+(`.rootfs` e `.cdroot`, qualche GB) e il `.tar.gz`: per stare tranquilli servono 5–6 GB liberi
+in quel momento. Quando `bt-container` fallisce non arriva alla sua pulizia finale e lascia
+sul disco la ISO estratta e il `.tar.gz` incompleto.
+
+Dove è finito lo spazio:
+
+```bash
+df -h / /mnt /turnkey; du -sh /mnt/isos /mnt/builds/container/* /turnkey/fab/products/* /turnkey/fab/products/turnkey-moodle/build 2>/dev/null | sort -h | tail -15
+```
+
+Prima di cancellare i resti, controlla che non ci siano mount rimasti (non deve stampare nulla):
+
+```bash
+mount | grep /mnt/builds
+```
+
+Cancella i resti dei tentativi falliti (con lo script i template riusciti sono già stati spostati
+nell'archivio, quindi in `/mnt/builds/container` restano solo quelli incompleti):
+
+```bash
+rm -rf /mnt/builds/container/*.rootfs /mnt/builds/container/*.cdroot /mnt/builds/container/debian-*.tar.gz*; df -h /mnt
+```
+
+Riprendi senza rifare la build: con `-n` lo script salta `make clean`, quindi `make` finisce subito
+e si ripetono solo `iso-release`, `bt-container` e l'archiviazione (sostituisci il branch):
+
+```bash
+tkl-build-lxc -n turnkey-moodle moodle405up-beta
+```
+
+Per non riempire di nuovo il disco:
+
+- sposta altrove (Proxmox, NAS) il contenuto di `/turnkey/fab/products/mybuilds`, che a ogni
+  build cresce di una ISO e di un template, e poi cancellalo da TKLDev;
+- `/mnt/isos` contiene la ISO dell'ultima build non archiviata e si può svuotare;
+- la cartella `build/` del repository resta fino al `make clean` successivo;
+- se TKLDev è una VM, la soluzione più semplice è ingrandirle il disco.
+
+### 6.2 Bootstrap mancante
+
+Sintomo, all'inizio di `make` (passo 4):
+
+```text
+/usr/share/fab/product.mk:48: *** bootstrap /turnkey/fab/bootstraps/trixie-amd64 not found - download or build it first.  Stop.
+```
+
+Il bootstrap è la base Debian minima da cui `make` costruisce ogni appliance. Si riscarica dal
+mirror TurnKey con la stessa procedura di `bt-iso` di buildtasks (download, verifica della firma
+GPG con la chiave TurnKey di trixie, scompattamento) più il controllo dello sha256:
+
+```bash
+mkdir -p /turnkey/fab/bootstraps && cd /turnkey/fab/bootstraps && B=bootstrap-trixie-amd64 && U=http://mirror.turnkeylinux.org/turnkeylinux/images/bootstrap && wget -nc "$U/$B.tar.gz" "$U/$B.tar.gz.hash" && K=$(mktemp -d)/k.gpg && gpg --no-default-keyring --keyring "$K" --import /turnkey/fab/common/keys/tkl-trixie-images.asc && gpg --no-default-keyring --keyring "$K" --verify "$B.tar.gz.hash" && grep -q "$(sha256sum "$B.tar.gz" | cut -d' ' -f1)" "$B.tar.gz.hash" && mkdir trixie-amd64 && tar -zxf "$B.tar.gz" -C trixie-amd64 && ls trixie-amd64 && cd -
+```
+
+Dopo l'estrazione il `.tar.gz` si può cancellare per recuperare spazio; il `.hash` invece deve
+restare, perché lo legge `generate-buildenv` (chiamato da `iso-release`, passo 5):
+
+```bash
+rm -f /turnkey/fab/bootstraps/bootstrap-trixie-amd64.tar.gz
+```
+
+Poi rilancia la build (con `-n` se la cartella `build/` del repository c'è ancora):
+
+```bash
+tkl-build-lxc turnkey-moodle moodle405up-beta
+```
+
+### 6.3 Clone di Moodle rifiutato da git.moodle.org
+
+Sintomo, durante `make` (passo 4):
+
+```text
+fatal: remote error: git.moodle.org is retiring anonymous git:// access to moodle.git. Please clone https://github.com/moodle/moodle.git instead.: /moodle.git
+```
+
+Nel `conf.d/main` del branch il clone va fatto da `https://github.com/moodle/moodle.git` invece che
+da `git://git.moodle.org/moodle.git` (già corretto in `moodle53-beta` e `moodle405up-beta`).
+Per vedere quali branch del repository usano ancora `git://`:
+
+```bash
+cd /turnkey/fab/products/turnkey-moodle && git fetch -q origin && for b in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin | grep -v '/HEAD$'); do git grep -n 'git://git.moodle.org' "$b" -- conf.d/main; done; cd -
+```
+
+### 6.4 Cosa non cancellare per liberare spazio
+
+Sotto `/turnkey/fab` non vanno toccate `bootstraps` (vedi 6.2), `common` e, se c'è, `cdroots`:
+servono a ogni build. Lo stesso vale per `/turnkey/buildtasks` e per il `.hash` del bootstrap.
+Le cartelle che crescono e si possono svuotare sono `/turnkey/fab/products/mybuilds` (dopo averne
+spostato il contenuto), `/mnt/isos` e i resti in `/mnt/builds/container` (vedi 6.1).
 
 ## Appendice: procedura manuale (senza script)
 
