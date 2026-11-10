@@ -11,14 +11,49 @@
 :: : :::   : : :  :   :: : :::   :: : :                                    
 ```
 
+# TurnKey Linux apps – test results
+
+Personal test results for [TurnKey Linux](https://www.turnkeylinux.org) appliances: does it build, does it log in, does it work after install.
+
+## About
+
+I am very honored to have been added to the GitHub organizations [turnkeylinux](https://github.com/turnkeylinux) and [Keel-Linux](https://github.com/Keel-Linux). That said, I want to be upfront about my role: what I do (and have mostly always done) is essentially **testing**, plus a few **small personal developments**. This repository is where I keep track of that work.
+
+I recently **vibe coded** a script that generates **LXC container templates** as well as ISOs: `tkl-build-lxc`, with its companion `tkl-build-lxc-setup`. It goes from a branch of an appliance repository to an archived ISO and LXC template, with hashes. It is a test tool written with AI help: use it, and read it, accordingly.
+
+## Contents
+
+- [TKL 19 – current tests](#turnkeylinux-apps---test-19)
+- [Build guide: from buildcode to LXC template](#build-guide-iso-and-lxc-templates)
+- [Archive: TKL 18.1 and earlier (historical)](#archive-tkl-181-and-earlier-historical)
+- [MEMO](#memo)
+
+## Build guide: ISO and LXC templates
+
+Step-by-step guide to build an appliance ISO and convert it to a Proxmox-ready LXC template, using `tkl-build-lxc` on TKLDev 19:
+
+- 🇮🇹 Italiano: [Operazioni_ISO_LXC_moodle-beta.md](https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/blob/recheck-26.06/Operazioni_ISO_LXC_moodle-beta.md)
+- 🇬🇧 English: [Operations_ISO_LXC_moodle-beta.md](https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/blob/recheck-26.06/Operations_ISO_LXC_moodle-beta.md)
+
+Quick start (as root on TKLDev, see the guide for details):
+
+```
+tkl-build-lxc-setup                              # one-time setup of buildtasks
+tkl-build-lxc turnkey-moodle moodle53-beta       # ISO + LXC template, archived with hashes
+```
+
+-----
+
 # turnkeylinux-apps - Test 19
 
+Moodle appliances built from the `turnkey-moodle` buildcode (one branch per appliance). Besides the two below, the repository also has the branches `moodle45up-beta`, `moodle42up-beta` and `moodle41up-beta` (Moodle 4.5, 4.2 and 4.1 branches), buildable with the same script.
+
 ### moodle405up-beta  ➡️ [Test ISO](#)
-* Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
-* Versions: Moodle Version Moodle 4.0.5 from tag (upgradable) / TurnKey Linux 19
+* Status: Builds OK. Login OK. Installing plugins is OK (semi-hardened mode)
+* Versions: Moodle 4.0.5 from tag (upgradable) / TurnKey Linux 19
 * Pull request: -
-* Git command:  tkl-build-lxc turnkey-moodle moodle405up-beta
-* Bugs/Notes: New build scripts. Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command "tkl-set-moodle-perms" . .git folder (if present) is reserved to toor for upgrades.
+* Git command: `tkl-build-lxc turnkey-moodle moodle405up-beta`
+* Bugs/Notes: New build scripts. Modified permissions script to support hardened and semi-hardened modes: in hardened mode (default) the admin cannot install plugins interactively, in semi-hardened mode they can. Switch mode with the command `tkl-set-moodle-perms`. The `.git` folder (if present) is reserved to root for upgrades.
 * Date: 10 Nov 2026
 
 ```
@@ -34,11 +69,11 @@ Instead, the global locale (en_AU.UTF-8) will be used to format certain strings 
 -----
 
 ### moodle53-beta  ➡️ [Test ISO](https://github.com/turnkeylinux-apps-test/turnkey-moodle/releases/tag/v53-beta)
-* Status: Builds OK. Login OK. Install plugins is OK (semi-harden)
-* Versions: Moodle Version Moodle 5.3.x, branch MOODLE_503_STABLE, Version 5.3 (Build: 20261005) as of todau / TurnKey Linux 19
+* Status: Builds OK. Login OK. Installing plugins is OK (semi-hardened mode)
+* Versions: Moodle 5.3.x, branch MOODLE_503_STABLE, Version 5.3 (Build: 20261005) as of today / TurnKey Linux 19
 * Pull request: -
-* Git command:  tkl-build-lxc turnkey-moodle moodle53-beta
-* Bugs/Notes: New build scripts. Modified perms script to harden or semi-harden: with harden (default) admin can not install plugins in interective way, with semi-harden. User can witch mode simply by using command "tkl-set-moodle-perms" . .git folder (if present) is reserved to toor for upgrades.
+* Git command: `tkl-build-lxc turnkey-moodle moodle53-beta`
+* Bugs/Notes: New build scripts. Modified permissions script to support hardened and semi-hardened modes: in hardened mode (default) the admin cannot install plugins interactively, in semi-hardened mode they can. Switch mode with the command `tkl-set-moodle-perms`. The `.git` folder (if present) is reserved to root for upgrades.
 * Date: 12 Oct 2026
 
 ```
@@ -52,6 +87,10 @@ Instead, the global locale (en_AU.UTF-8) will be used to format certain strings 
 ```
 
 -----
+
+# Archive: TKL 18.1 and earlier (historical)
+
+*Everything below is kept as a historical record, unchanged.*
 
 # turnkeylinux-apps - Test 18.1
 
@@ -336,6 +375,8 @@ make: *** [/usr/share/fab/product.mk:569: build/stamps/root.patched] Error 1
 * Bugs/Notes: -
 * Date: -
 -----
+
+---
 
 ## MEMO
 
