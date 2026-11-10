@@ -11,6 +11,87 @@
 :: : :::   : : :  :   :: : :::   :: : :                                    
 ```
 
+# TurnKey Linux apps – test results
+
+Personal test results for [TurnKey Linux](https://www.turnkeylinux.org) appliances: does it build, does it log in, does it work after install.
+
+## About
+
+I am very honored to have been added to the GitHub organizations [turnkeylinux](https://github.com/turnkeylinux) and [Keel-Linux](https://github.com/Keel-Linux). That said, I want to be upfront about my role: what I do (and have mostly always done) is essentially **testing**, plus a few **small personal developments**. This repository is where I keep track of that work.
+
+I recently **vibe coded** a script that generates **LXC container templates** as well as ISOs: `tkl-build-lxc`, with its companion `tkl-build-lxc-setup`. It goes from a branch of an appliance repository to an archived ISO and LXC template, with hashes. It is a test tool written with AI help: use it, and read it, accordingly.
+
+## Contents
+
+- [TKL 19 – current tests](#turnkeylinux-apps---test-19)
+- [Build guide: from buildcode to LXC template](#build-guide-iso-and-lxc-templates)
+- [Archive: TKL 18.1 and earlier (historical)](#archive-tkl-181-and-earlier-historical)
+- [MEMO](#memo)
+
+## Build guide: ISO and LXC templates
+
+Step-by-step guide to build an appliance ISO and convert it to a Proxmox-ready LXC template, using `tkl-build-lxc` on TKLDev 19:
+
+- 🇮🇹 Italiano: [Operazioni_ISO_LXC_moodle-beta.md](https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/blob/recheck-26.06/Operazioni_ISO_LXC_moodle-beta.md)
+- 🇬🇧 English: [Operations_ISO_LXC_moodle-beta.md](https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/blob/recheck-26.06/Operations_ISO_LXC_moodle-beta.md)
+
+Quick start (as root on TKLDev, see the guide for details):
+
+```
+tkl-build-lxc-setup                              # one-time setup of buildtasks
+tkl-build-lxc turnkey-moodle moodle53-beta       # ISO + LXC template, archived with hashes
+```
+
+-----
+
+# turnkeylinux-apps - Test 19
+
+Moodle appliances built from the `turnkey-moodle` buildcode (one branch per appliance). Besides the two below, the repository also has the branches `moodle45up-beta`, `moodle42up-beta` and `moodle41up-beta` (Moodle 4.5, 4.2 and 4.1 branches), buildable with the same script.
+
+### moodle405up-beta  ➡️ [Test ISO](#)
+* Status: Builds OK. Login OK. Installing plugins is OK (semi-hardened mode)
+* Versions: Moodle 4.0.5 from tag (upgradable) / TurnKey Linux 19
+* Pull request: -
+* Git command: `tkl-build-lxc turnkey-moodle moodle405up-beta`
+* Bugs/Notes: New build scripts. Modified permissions script to support hardened and semi-hardened modes: in hardened mode (default) the admin cannot install plugins interactively, in semi-hardened mode they can. Switch mode with the command `tkl-set-moodle-perms`. The `.git` folder (if present) is reserved to root for upgrades.
+* Date: 10 Nov 2026
+
+```
+Your server does not seem to fully support the following languages:
+
+    English ‎(en)‎
+    Français ‎(fr)‎
+    Italiano ‎(it)‎
+
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
+```
+
+-----
+
+### moodle53-beta  ➡️ [Test ISO](https://github.com/turnkeylinux-apps-test/turnkey-moodle/releases/tag/v53-beta)
+* Status: Builds OK. Login OK. Installing plugins is OK (semi-hardened mode)
+* Versions: Moodle 5.3.x, branch MOODLE_503_STABLE, Version 5.3 (Build: 20261005) as of today / TurnKey Linux 19
+* Pull request: -
+* Git command: `tkl-build-lxc turnkey-moodle moodle53-beta`
+* Bugs/Notes: New build scripts. Modified permissions script to support hardened and semi-hardened modes: in hardened mode (default) the admin cannot install plugins interactively, in semi-hardened mode they can. Switch mode with the command `tkl-set-moodle-perms`. The `.git` folder (if present) is reserved to root for upgrades.
+* Date: 12 Oct 2026
+
+```
+Your server does not seem to fully support the following languages:
+
+    English ‎(en)‎
+    Français ‎(fr)‎
+    Italiano ‎(it)‎
+
+Instead, the global locale (en_AU.UTF-8) will be used to format certain strings such as dates or numbers.
+```
+
+-----
+
+# Archive: TKL 18.1 and earlier (historical)
+
+*Everything below is kept as a historical record, unchanged.*
+
 # turnkeylinux-apps - Test 18.1
 
 ### gitea ➡️ [Test ISO](https://github.com/UncleDan/turnkey-gitea/releases/tag/v18.1-RC1)
@@ -20,23 +101,9 @@
 * Git command: git clone https://github.com/UncleDan/turnkey-gitea.git -b turnkey-gitea-18.1-RC1
 * Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/blob/main/hotfix-mysqltuner-perl-link.sh* Works out of the box, only updated versions in docs. Still can't login as "gitea" admin.
 * Date: 18 Feb 2026
+
 -----
-### moodle5  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v5-18.1-RC2)
-* Status: Builds OK. Login OK.
-* Versions: Moodle Version 5.1.3+ (Build: 20260217) as of today / TurnKey Linux 18.1
-* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/32
-* Git command: git clone --branch turnkey-moodle5-18.1-RC2 https://github.com/UncleDan/turnkey-moodle.git turnkey-moodle5
-* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/blob/main/hotfix-mysqltuner-perl-link.sh* Re-checked, works downloading sources via git branch MOODLE_501_STABLE.
-* Date: 18 Feb 2026
------
-### moodle4  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-moodle/releases/tag/v4-18.1-RC2)
-* Status: Builds OK. Login OK.
-* Versions: Moodle Version 4.5.10+ (Build: 20260217) as of today / TurnKey Linux 18.1
-* Pull request: https://github.com/turnkeylinux-apps/moodle/pull/31
-* Git command: git clone --branch turnkey-moodle4-18.1-RC2 https://github.com/UncleDan/turnkey-moodle.git turnkey-moodle4
-* Bugs/Notes: *Hotfix for MySql performance needed on TKLdev, for example https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io/blob/main/hotfix-mysqltuner-perl-link.sh* Re-checked, works downloading sources via git branch MOODLE_405_STABLE.
-* Date: 18 Feb 2026
------
+
 ### mattermost  ➡️ [Test ISO](https://github.com/UncleDan/turnkey-mattermost/releases/tag/turnkey-mattermost-18.1-RC1)
 * Status: Builds OK. Login OK.
 * Versions: Moodle 11.3.1 as of today / TurnKey Linux 18.1
@@ -309,16 +376,47 @@ make: *** [/usr/share/fab/product.mk:569: build/stamps/root.patched] Error 1
 * Date: -
 -----
 
+---
+
 ## MEMO
+
+### Do this once just after installing:
+
+```
+cd /turnkey
+git clone https://github.com/turnkeylinux/bootstrap.git
+cd bootstrap
+RELEASE=debian/trixie make clean install
+```
+
+### Do this for each app to test:
+
 ```
 git clone https://github.com/turnkeylinux-apps/myappname
 cd myappname
 make
-mkdir -p ../mybuilds ; mv build/product.iso ../mybuilds/$(basename $(pwd))-18.1-bookworm-amd64_$(date -r build/product.iso +%Y-%m-%d_%H-%MUTC).iso
-mkdir -p ../mybuilds ; mv build/product.iso ../mybuilds/turnkey-$(basename $(pwd))-18.1-bookworm-amd64_$(date -r build/product.iso +%Y-%m-%d_%H-%MUTC).iso
+
+mkdir -p ../mybuilds ; mv build/product.iso ../mybuilds/$(basename $(pwd))-19.0-trixie-amd64_beta_$(date -r build/product.iso +%Y-%m-%d_%H-%MUTC).iso
+for f in ../mybuilds/*.iso; do [ -f "$f" ] && [ ! -f "$f.hash" ] && sha256sum "$f" > "$f.hash"; done
 ```
+
+```
+hostnamectl set-hostname moodle4.testdl.it
+```
+
+```
+nano /etc/hosts
+```
+
+```
+  GNU nano 8.4                                 /etc/hosts *
+127.0.0.1 localhost
+192.168.24.74 moodle4.testdl.it moodle4
+[...]
+```
+
 
 Copy of this in repository:
 ```
-https://github.com/UncleDan/turnkeylinux-apps-test-18
+https://github.com/turnkeylinux-apps-test/turnkeylinux-apps-test.github.io
 ```

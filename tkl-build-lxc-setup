@@ -1,0 +1,97 @@
+#!/bin/bash
+# tkl-build-lxc-setup by Daniele Lolli (UncleDan) feat. Claude AI - Release 1.0 - 2026-10-10 20-18-02
+#
+# One-time setup of buildtasks for tkl-build-lxc. Each step is done only if
+# needed, so the script can be run any number of times:
+#   1. create $BT/config from config.example
+#   2. create the ISO and build directories set in the config ($BT_ISOS, $BT_BUILDS)
+#   3. fix bin/generate-signature (buildtasks 18.x/19.x), which rejects
+#      container templates (debian-*-turnkey-*.tar.gz) and makes bt-container
+#      end with "FATAL [generate-signature]: Unexpected filename"
+#
+# The fix is a local change to the buildtasks Git repository. Before updating
+# buildtasks undo it, then run this script again:
+#   git -C /turnkey/buildtasks checkout bin/generate-signature && git -C /turnkey/buildtasks pull
+#
+# Usage: tkl-build-lxc-setup [-c]
+#   -c   check only: report what is missing, change nothing (exit 1 if missing)
+#
+# Environment (defaults in brackets):
+#   BT   buildtasks directory [/turnkey/buildtasks]
+
+set -Eeuo pipefail
+
+APP=$(basename "$0")
+info()  { echo "INFO [$APP]: $*"; }
+fatal() { echo "FATAL [$APP]: $*" 1>&2; exit 1; }
+# shellcheck disable=SC2154  # rc is assigned inside the trap
+trap 'rc=$?; echo "FATAL [$APP]: failed (exit $rc, line $LINENO): $BASH_COMMAND" 1>&2; exit $rc' ERR
+
+check_only=""
+case ${1:-} in
+    "")         ;;
+    -c)         check_only="yes" ;;
+    *)          sed -n '/^# Usage:/,/^#   BT /p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac
+
+BT=${BT:-/turnkey/buildtasks}
+sig=$BT/bin/generate-signature
+missing=0
+
+[[ -n $check_only || $EUID -eq 0 ]] || fatal "must be run as root"
+[[ -d $BT/config.example && -f $sig ]] || fatal "buildtasks not found in $BT"
+
+# 1. config
+if [[ -f $BT/config/common.cfg ]]; then
+    info "config: already present ($BT/config)"
+elif [[ -n $check_only ]]; then
+    info "config: MISSING ($BT/config)"; missing=1
+else
+    [[ ! -e $BT/config ]] || fatal "$BT/config exists but has no common.cfg"
+    cp -R "$BT/config.example" "$BT/config"
+    info "config: created $BT/config from config.example"
+fi
+
+# 2. directories from the config
+if [[ -f $BT/config/common.cfg ]]; then
+    # the config uses variables that may be unset (e.g. GITHUB_USER)
+    set +u
+    # shellcheck source=/dev/null
+    source "$BT/config/common.cfg"
+    set -u
+    for d in "${BT_ISOS:?BT_ISOS not set in config}" "${BT_BUILDS:?BT_BUILDS not set in config}"; do
+        if [[ -d $d ]]; then
+            info "directory: already present ($d)"
+        elif [[ -n $check_only ]]; then
+            info "directory: MISSING ($d)"; missing=1
+        else
+            mkdir -p "$d"
+            info "directory: created $d"
+        fi
+    done
+fi
+
+# 3. generate-signature fix
+if grep -q 'debian-\*-turnkey-\*.tar.gz' "$sig"; then
+    info "generate-signature: fix already present"
+elif ! grep -q 'Unexpected filename' "$sig"; then
+    info "generate-signature: no fix needed (this buildtasks version accepts any file)"
+elif [[ -n $check_only ]]; then
+    info "generate-signature: fix MISSING ($sig)"; missing=1
+else
+    # shellcheck disable=SC2016  # literal text, no expansion wanted
+    grep -q '^elif \[\[ "\$filename" == "turnkey"\*"\.iso" \]\]; then$' "$sig" \
+        || fatal "generate-signature: upstream code changed, fix not applied"
+    # shellcheck disable=SC2016
+    sed -i '/^elif \[\[ "\$filename" == "turnkey"\*"\.iso" \]\]; then$/i elif [[ "$filename" == debian-*-turnkey-*.tar.gz ]]; then\n    BRANCH="$(get_tkl_ver_no "$CODENAME")"' "$sig"
+    bash -n "$sig" || fatal "generate-signature: syntax error after the fix"
+    grep -q 'debian-\*-turnkey-\*.tar.gz' "$sig" || fatal "generate-signature: fix not applied"
+    info "generate-signature: fix applied"
+    git -C "$BT" diff --stat -- bin/generate-signature 2>/dev/null || true
+fi
+
+if [[ -n $check_only && $missing -ne 0 ]]; then
+    info "setup incomplete: run $APP as root"
+    exit 1
+fi
+info "setup complete"
